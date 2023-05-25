@@ -1,5 +1,6 @@
 import os
 import pygame
+import random
 from pygame.time import Clock
 
 # define window elements
@@ -25,38 +26,50 @@ class Ttoki(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = ttoki_x
         self.rect.y = ttoki_y
-        # TODO: sound for consuming carrot
+        # TODO: sound for consuming strawberry
+    
+    def move_up(self):
+        self.rect.y -= HERO_TTOKI_VEL
+    
+    def move_down(self):
+        self.rect.y += HERO_TTOKI_VEL
+    
+    def move_left(self):
+        self.rect.x -= HERO_TTOKI_VEL
+    
+    def move_right(self):
+        self.rect.x += HERO_TTOKI_VEL
 
-# define CARROT elements
-CARROT_IMAGE = pygame.image.load(os.path.join('Assets', 'carrot.png'))
-CARROT_HEIGHT = 40
-CARROT_WIDTH = 40
 
-class Carrot(pygame.sprite.Sprite):
-    def __init__(self, path, carrot_x, carrot_y):
+# define strawberry elements
+STRAWBERRY_HEIGHT = 100
+STRAWBERRY_WIDTH = 100
+
+class Strawberry(pygame.sprite.Sprite):
+    def __init__(self, path, strawberry_x, strawberry_y):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(path), (CARROT_HEIGHT, CARROT_WIDTH))
+        self.image = pygame.transform.scale(pygame.image.load(path), (STRAWBERRY_HEIGHT, STRAWBERRY_WIDTH))
         self.rect = self.image.get_rect()
-        self.rect.x = carrot_x
-        self.rect.y = carrot_y
-
+        self.rect.x = strawberry_x
+        self.rect.y = strawberry_y
+    
 # render defined elements
-def draw_window(ttoki_sprite, carrot_sprites):
+def draw_window(ttoki_sprite, strawberry_sprites):
     WIN.blit(GRASS, (0,0))
+    strawberry_sprites.draw(WIN)
     ttoki_sprite.draw(WIN)
-    carrot_sprites.draw(WIN)
     pygame.display.update()
 
 # handles controls and powers
-# def ttoki_handle_movement(keys_pressed, hero):
-#     if keys_pressed[pygame.K_UP]:
-#         hero.y -= HERO_TTOKI_VEL
-#     if keys_pressed[pygame.K_DOWN]:
-#         hero.y += HERO_TTOKI_VEL
-#     if keys_pressed[pygame.K_LEFT]:
-#         hero.x -= HERO_TTOKI_VEL
-#     if keys_pressed[pygame.K_RIGHT]:
-#         hero.x += HERO_TTOKI_VEL
+def ttoki_handle_movement(keys_pressed, ttoki):
+    if keys_pressed[pygame.K_UP]:
+        ttoki.move_up()
+    if keys_pressed[pygame.K_DOWN]:
+        ttoki.move_down()
+    if keys_pressed[pygame.K_LEFT]:
+        ttoki.move_left()
+    if keys_pressed[pygame.K_RIGHT]:
+        ttoki.move_right()
     
     # define powers
     # Speed Boost
@@ -68,9 +81,10 @@ def main():
     ttoki_sprite = pygame.sprite.Group()
     ttoki_sprite.add(ttoki)
 
-    carrot = Carrot(os.path.join('Assets', 'carrot.png'), 100, 100)
-    carrot_sprites = pygame.sprite.Group()
-    carrot_sprites.add(carrot)
+    strawberry_sprites = pygame.sprite.Group()
+    for i in range(50):
+        new_strawberry = Strawberry(os.path.join('Assets', 'strawberry.png'), random.randrange(0, WIDTH), random.randrange(0, WIDTH))
+        strawberry_sprites.add(new_strawberry)
     
     # enable event loop
     clock = Clock()
@@ -80,9 +94,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        # keys_pressed = pygame.key.get_pressed()
-        # ttoki_handle_movement(keys_pressed, hero_ttoki)
-        draw_window(ttoki_sprite, carrot_sprites)
+        keys_pressed = pygame.key.get_pressed()
+        ttoki_handle_movement(keys_pressed, ttoki)
+        draw_window(ttoki_sprite, strawberry_sprites)
 
     pygame.quit()
 

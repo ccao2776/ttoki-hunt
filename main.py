@@ -39,6 +39,7 @@ class Ttoki(pygame.sprite.Sprite):
     
     def move_right(self):
         self.rect.x += HERO_TTOKI_VEL
+        
 
 
 # define strawberry elements
@@ -54,8 +55,9 @@ class Strawberry(pygame.sprite.Sprite):
         self.rect.y = strawberry_y
     
 # render defined elements
-def draw_window(ttoki_sprite, strawberry_sprites):
+def draw_window(ttoki_sprite, strawberry_sprites, text, text_rect):
     WIN.blit(GRASS, (0,0))
+    WIN.blit(text, text_rect)
     strawberry_sprites.draw(WIN)
     ttoki_sprite.draw(WIN)
     pygame.display.update()
@@ -77,6 +79,7 @@ def ttoki_handle_movement(keys_pressed, ttoki):
     # Magnet
 
 def main():
+    pygame.font.init()
     ttoki = Ttoki(os.path.join('Assets', 'hero_ttoki.gif'), WIDTH / 2, HEIGHT / 2)
     ttoki_sprite = pygame.sprite.Group()
     ttoki_sprite.add(ttoki)
@@ -89,14 +92,32 @@ def main():
     # enable event loop
     clock = Clock()
     run = True
+    
+    font = pygame.font.SysFont(None, 100)
+    counter = 10
+    text = font.render(str(counter), True, (0, 128, 0))
+
+    timer_event = pygame.USEREVENT+1
+    pygame.time.set_timer(timer_event, 1000)
+
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            elif event.type == timer_event:
+                counter -= 1
+                text = font.render(str(counter), True, (0, 0, 0))
+                if counter == 0:
+                    pygame.time.set_timer(timer_event, 0) 
+                    # insert quit screen
+     
         keys_pressed = pygame.key.get_pressed()
         ttoki_handle_movement(keys_pressed, ttoki)
-        draw_window(ttoki_sprite, strawberry_sprites)
+        pygame.sprite.spritecollide(ttoki, strawberry_sprites,True)
+        text_rect = text.get_rect(center = WIN.get_rect().center)
+        draw_window(ttoki_sprite, strawberry_sprites, text, text_rect)
+
 
     pygame.quit()
 

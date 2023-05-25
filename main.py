@@ -10,48 +10,68 @@ WHITE = (255, 255, 255)
 
 FPS = 60
 
-# define TTOKI elements
-HERO_TTOKI_IMAGE = pygame.image.load(os.path.join('Assets', 'hero_ttoki.gif'))
-HERO_TTOKI_HEIGHT = 55
-HERO_TTOKI_WIDTH = 40
-HERO_TTOKI = pygame.transform.scale(HERO_TTOKI_IMAGE, (HERO_TTOKI_HEIGHT, HERO_TTOKI_WIDTH))
-HERO_TTOKI_VEL = 5
-
 # define Background
 GRASS = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'grass.png')), (WIDTH, HEIGHT))
+
+# define TTOKI elements
+HERO_TTOKI_HEIGHT = 55
+HERO_TTOKI_WIDTH = 40
+HERO_TTOKI_VEL = 5
+
+class Ttoki(pygame.sprite.Sprite):
+    def __init__(self, path, ttoki_x, ttoki_y):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load(path), (HERO_TTOKI_HEIGHT, HERO_TTOKI_WIDTH))
+        self.rect = self.image.get_rect()
+        self.rect.x = ttoki_x
+        self.rect.y = ttoki_y
+        # TODO: sound for consuming carrot
 
 # define CARROT elements
 CARROT_IMAGE = pygame.image.load(os.path.join('Assets', 'carrot.png'))
 CARROT_HEIGHT = 40
 CARROT_WIDTH = 40
-CARROT = pygame.transform.scale(CARROT_IMAGE, (CARROT_HEIGHT, CARROT_WIDTH))
+
+class Carrot(pygame.sprite.Sprite):
+    def __init__(self, path, carrot_x, carrot_y):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load(path), (CARROT_HEIGHT, CARROT_WIDTH))
+        self.rect = self.image.get_rect()
+        self.rect.x = carrot_x
+        self.rect.y = carrot_y
 
 # render defined elements
-def draw_window(hero, carrots):
+def draw_window(ttoki_sprite, carrot_sprites):
     WIN.blit(GRASS, (0,0))
-    WIN.blit(CARROT, (carrots.x, carrots.y))
-    WIN.blit(HERO_TTOKI, (hero.x, hero.y))
+    ttoki_sprite.draw(WIN)
+    carrot_sprites.draw(WIN)
     pygame.display.update()
 
 # handles controls and powers
-def ttoki_handle_movement(keys_pressed, hero):
-    if keys_pressed[pygame.K_UP]:
-        hero.y -= HERO_TTOKI_VEL
-    if keys_pressed[pygame.K_DOWN]:
-        hero.y += HERO_TTOKI_VEL
-    if keys_pressed[pygame.K_LEFT]:
-        hero.x -= HERO_TTOKI_VEL
-    if keys_pressed[pygame.K_RIGHT]:
-        hero.x += HERO_TTOKI_VEL
+# def ttoki_handle_movement(keys_pressed, hero):
+#     if keys_pressed[pygame.K_UP]:
+#         hero.y -= HERO_TTOKI_VEL
+#     if keys_pressed[pygame.K_DOWN]:
+#         hero.y += HERO_TTOKI_VEL
+#     if keys_pressed[pygame.K_LEFT]:
+#         hero.x -= HERO_TTOKI_VEL
+#     if keys_pressed[pygame.K_RIGHT]:
+#         hero.x += HERO_TTOKI_VEL
     
     # define powers
     # Speed Boost
     # Teleport
     # Magnet
-        
+
 def main():
-    hero = pygame.Rect(WIDTH / 2, HEIGHT / 2, HERO_TTOKI_WIDTH, HERO_TTOKI_HEIGHT)
-    carrot = pygame.Rect(100, 100, CARROT_HEIGHT, CARROT_WIDTH)
+    ttoki = Ttoki(os.path.join('Assets', 'hero_ttoki.gif'), WIDTH / 2, HEIGHT / 2)
+    ttoki_sprite = pygame.sprite.Group()
+    ttoki_sprite.add(ttoki)
+
+    carrot = Carrot(os.path.join('Assets', 'carrot.png'), 100, 100)
+    carrot_sprites = pygame.sprite.Group()
+    carrot_sprites.add(carrot)
+    
     # enable event loop
     clock = Clock()
     run = True
@@ -60,9 +80,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        keys_pressed = pygame.key.get_pressed()
-        ttoki_handle_movement(keys_pressed, hero)
-        draw_window(hero, carrot)
+        # keys_pressed = pygame.key.get_pressed()
+        # ttoki_handle_movement(keys_pressed, hero_ttoki)
+        draw_window(ttoki_sprite, carrot_sprites)
 
     pygame.quit()
 
